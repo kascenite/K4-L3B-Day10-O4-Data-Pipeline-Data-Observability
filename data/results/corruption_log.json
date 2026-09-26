@@ -1,46 +1,46 @@
 {
-    "dropped_latest_records": {
-        "count": 4,
-        "affected_indices": [
-            0,
-            1,
-            2,
-            3
-        ]
-    },
-    "blank_summary": {
-        "count": 2,
-        "affected_indices": [
-            18,
-            17
-        ]
-    },
-    "injected_noise": {
-        "count": 2,
-        "affected_indices": [
-            13,
-            8
-        ]
-    },
-    "truncated_title": {
-        "count": 2,
-        "affected_indices": [
-            10,
-            8
-        ]
-    },
-    "stale_date": {
-        "count": 2,
-        "affected_indices": [
-            13,
-            10
-        ]
-    },
-    "duplicated_rows": {
-        "count": 2,
-        "original_indices_duplicated": [
-            16,
-            12
-        ]
-    }
+  "dropped_latest_records": {
+    "count": 4,
+    "affected_indices": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "blank_summary": {
+    "count": 2,
+    "affected_indices": [
+      14,
+      15
+    ]
+  },
+  "injected_noise": {
+    "count": 2,
+    "affected_indices": [
+      4,
+      5
+    ]
+  },
+  "truncated_title": {
+    "count": 2,
+    "affected_indices": [
+      13,
+      10
+    ]
+  },
+  "stale_date": {
+    "count": 2,
+    "affected_indices": [
+      19,
+      18
+    ]
+  },
+  "duplicated_rows": {
+    "count": 2,
+    "original_indices_duplicated": [
+      16,
+      20
+    ]
+  }
 }
