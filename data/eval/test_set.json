@@ -1,0 +1,92 @@
+[
+  {
+    "id": "q01",
+    "question_type": "summary",
+    "question": "Bài báo ‘DOLPHIN: A Privacy-Preserving Digital Investigation Readiness Assessment Framework based on Offline Large Language Models and Retrieval-Augmented Generation’ nghiên cứu vấn đề gì và đạt được kết quả nào?",
+    "ground_truth": "Increasingly, digital forensic investigations require a quick, reliable, and privacy-preserving assessment of case materials before formal forensic examination. Existing approaches to forensic readiness are, however, infrastructure-based and inadequately support the completeness of evidence, the identification of evidence gaps, and preparation of a structured investigation at the case level. This study introduces a privacy-preserving framework for assessing digital investigation readiness called DOLPHIN, which integrates offline large language models with retrieval-augmented generation to provide evidence-based investigation support. Thirty sets of 30 cases of structured investigation scenarios were created under five evidence-completeness conditions: complete-evidence, partial-evidence, and low-evidence cases. A Forensic Readiness Index was scored for each case across six categories of evidence: victim statement, FIR/CSR, CCTV evidence, witness statement, ownership documents, and metadata. The deficiencies were categorized using a taxonomy of evidence gaps. Evidence gaps were classified into four categories: documentation gaps, corroboration gaps, visual gaps, and time gaps. To ensure that critical investigation data is not processed in the cloud, the framework was deployed locally with the help of LM Studio, AnythingLLM, and Qwen 3. The experimental results indicated that DOLPHIN obtained a readiness classification accuracy of 92.0% and excellent evidence-gap detection performance with F1 scores ranging from 90.27% to 94.60%. The retrieval performance with metadata-filtered RAG was found to be superior, with 90.33% top-1 accuracy, 99.67% top-3 accuracy, and 94.06% mean reciprocal rank. The unsupported output rate went down from 16.33% to 2.00% when using metadata-filtered RAG. DOLPHIN also significantly reduced the mean preparation time, from 15.46 to 4.41 minutes per case, and increased the completion rate for reports. The results show the potential of offline LLM-RAG systems to aid in investigation-readiness assessment in a human-centered and interpretable way while preserving privacy.",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-10489777/v1"
+    ]
+  },
+  {
+    "id": "q02",
+    "question_type": "summary",
+    "question": "Bài báo ‘Agentic Retrieval-Augmented Generation for Verifiable Regulatory Compliance in Urban Cyber-Physical Systems’ nghiên cứu vấn đề gì và đạt được kết quả nào?",
+    "ground_truth": "Urban Cyber-Physical Systems (UCPS) support sustainable cities through the integration of Internet of Things (IoT), Artificial Intelligence (AI), and digi-tal infrastructures for environmental monitoring, urban planning, and resilient public services. However, ensuring regulatory compliance is increasingly chal-lenging because environmental, cybersecurity, municipal planning, and AI gov-ernance regulations evolve continuously across jurisdictions. Existing Retrieval-Augmented Generation (RAG) approaches improve evidence retrieval but remain vulnerable to hallucinations, regulatory supersession errors, and jurisdictional inconsistencies due to the absence of deterministic regulatory verification. This paper proposes a Verification-First Agentic Retrieval-Augmented Generation framework for trustworthy regulatory compliance reasoning in UCPS. The framework incorporates a Retrieval Agent, a deterministic Critic Agent, and a Formatting Agent to validate temporal validity, regulatory supersession, juris-dictional applicability, and compliance scope before language-model generation. A curated regulatory corpus and a benchmark comprising 78 regulatory com-pliance probes were used for evaluation against BM25, Dense RAG, Self-RAG, and Corrective RAG (CRAG). The proposed framework achieved a superses-sion detection rate of 0.88, perfect standalone Critic Agent validation (Precision = Recall = F1-score = 1.00), improved retrieval ranking quality (nDCG@5 = 0.75), and competitive computational efficiency. These results demonstrate that deterministic verification significantly improves the reliability, transparency, and trustworthiness of regulatory reasoning for sustainable urban governance.",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-10349437/v1"
+    ]
+  },
+  {
+    "id": "q03",
+    "question_type": "summary",
+    "question": "Bài báo ‘Parameter-Efficient Contextual Calibration for Hallucination Mitigation in Domain-Specific Large Language Model Retrieval-Augmented Generation’ nghiên cứu vấn đề gì và đạt được kết quả nào?",
+    "ground_truth": "Retrieval-Augmented Generation (RAG) has become the gold standard paradigm for deploying Large Language Models (LLMs) in knowledge-intensive and high-stakes domains such as biomedical inquiry, financial compliance, and legal reasoning. Despite providing external grounding documents, LLMs continue to exhibit insidious factual hallucinations—either by fabricating plausible-sounding unsupported assertions or by ignoring conflicting retrieved evidence in favor of memorized parametric training biases. Existing mitigation approaches, such as full-parameter fine-tuning or iterative self-reflection prompting, incur prohibitive computational costs and excessive inference latency. In this paper, we propose CAL-RAG (Context-Aware Low-Rank Calibration for RAG), a parameter-efficient fine-tuning and decoding calibration framework designed to enforce strict contextual faithfulness without compromising generative fluency. CAL-RAG introduces a dual-channel Low-Rank Adaptation (LoRA) mechanism: a Context-Grounded Adapter that measures token-level semantic consistency against retrieved evidence chunks, and an Entropy-Gated Decoding Controller that dynamically modulates vocabulary probability distributions during autoregressive generation based on cross-attention dispersion. We conduct extensive empirical evaluations across three challenging domain benchmarks: BioASQ (biomedical), FinQA (financial reasoning), and LegalBench (legal clause interpretation), utilizing open-source LLM backbones (Llama-3-8B, Mistral-7B-Instruct, and Gemma-7B). CAL-RAG reduces factual hallucination rates by 43.7% relative to standard RAG baselines while improving Faithfulness Score from 0.642 to 0.891 and answer accuracy by +11.8% F1. Remarkably, CAL-RAG adds only 0.4% trainable parameters and introduces less than 6.5 ms token latency overhead, making it highly suitable for enterprise production deployment.",
+    "ground_truth_doc_ids": [
+      "10.66917/ijaeic.a000015"
+    ]
+  },
+  {
+    "id": "q04",
+    "question_type": "authors",
+    "question": "Ai là tác giả của bài báo ‘Retrieval-Augmented Generation for Large Language Model-Based Intelligent Assistants: A Review’?",
+    "ground_truth": "Zilang Shao",
+    "ground_truth_doc_ids": [
+      "10.70267/aitia.2026482489"
+    ]
+  },
+  {
+    "id": "q05",
+    "question_type": "authors",
+    "question": "Ai là tác giả của bài báo ‘Intelligent automation of economic processes based on retrieval-augmented generation and large language models’?",
+    "ground_truth": "Serhii Arefiev, Serhii Hildi",
+    "ground_truth_doc_ids": [
+      "10.36887/2415-8453-2026-3-2"
+    ]
+  },
+  {
+    "id": "q06",
+    "question_type": "authors",
+    "question": "Ai là tác giả của bài báo ‘Evidence Constrained Agentic Retrieval Augmented Generation for Substation Civil Engineering Preliminary Design Documents in a Single Project Study’?",
+    "ground_truth": "Yizhang Huang, Xinhui Zhang",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-10423755/v1"
+    ]
+  },
+  {
+    "id": "q07",
+    "question_type": "date",
+    "question": "Bài báo ‘SafeRAG: A Large-Language-Model-Based Multistage Retrieval-Augmented Framework for Oil and Gas Safety Report Generation’ được xuất bản vào ngày nào?",
+    "ground_truth": "2026-08-01",
+    "ground_truth_doc_ids": [
+      "10.2118/234689-pa"
+    ]
+  },
+  {
+    "id": "q08",
+    "question_type": "date",
+    "question": "Bài báo ‘Does retrieval-augmented generation impact medical students’ perceptions of large language models? (Preprint)’ được xuất bản vào ngày nào?",
+    "ground_truth": "2026-07-03",
+    "ground_truth_doc_ids": [
+      "10.2196/preprints.106157"
+    ]
+  },
+  {
+    "id": "q09",
+    "question_type": "categories",
+    "question": "Bản ghi của bài báo ‘DOLPHIN: A Privacy-Preserving Digital Investigation Readiness Assessment Framework based on Offline Large Language Models and Retrieval-Augmented Generation’ liệt kê những danh mục nào?",
+    "ground_truth": "Bản ghi không có thông tin danh mục (categories).",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-10489777/v1"
+    ]
+  },
+  {
+    "id": "q10",
+    "question_type": "categories",
+    "question": "Bản ghi của bài báo ‘Retrieval-Augmented Generation for Large Language Model-Based Intelligent Assistants: A Review’ liệt kê những danh mục nào?",
+    "ground_truth": "Bản ghi không có thông tin danh mục (categories).",
+    "ground_truth_doc_ids": [
+      "10.70267/aitia.2026482489"
+    ]
+  }
+]
