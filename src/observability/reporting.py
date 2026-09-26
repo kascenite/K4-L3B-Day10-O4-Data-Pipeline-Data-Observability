@@ -131,5 +131,56 @@ def generate_corruption_report(
     corrupted_freshness: dict[str, Any],
     repaired_freshness: dict[str, Any],
 ) -> None:
-    """TODO(student): viet markdown report so sanh baseline/corrupted/repaired."""
-    raise NotImplementedError("Student task: implement corruption comparison report.")
+    """Write a Markdown report comparing Baseline vs Corrupted vs Repaired."""
+
+    def _get(d: dict, key: str) -> str:
+        v = d.get(key)
+        if v is None:
+            return "n/a"
+        try:
+            return f"{float(v):.4f}"
+        except (TypeError, ValueError):
+            return str(v)
+
+    report = f"""# Corruption & Repair Report
+
+Generated at: {datetime.now(UTC).isoformat()}
+
+## Executive Summary
+
+This report compares three pipeline states to demonstrate the impact of data corruption
+on RAG retrieval quality and the effectiveness of the idempotent repair mechanism.
+
+- **Corrupted quality gate**: {'PASS' if corrupted_quality.get('success') else 'FAIL'}
+- **Repaired quality gate**: {'PASS' if repaired_quality.get('success') else 'FAIL'}
+
+## Metrics Comparison (Baseline vs Corrupted vs Repaired)
+
+| Metric | Baseline | Corrupted | Repaired |
+|---|---:|---:|---:|
+| Retrieval Hit Rate | {_get(baseline_metrics, 'retrieval_hit_rate')} | {_get(corrupted_metrics, 'retrieval_hit_rate')} | {_get(repaired_metrics, 'retrieval_hit_rate')} |
+| Mean Token F1 | {_get(baseline_metrics, 'mean_token_f1')} | {_get(corrupted_metrics, 'mean_token_f1')} | {_get(repaired_metrics, 'mean_token_f1')} |
+| Judge Accuracy | {_get(baseline_metrics, 'judge_accuracy')} | {_get(corrupted_metrics, 'judge_accuracy')} | {_get(repaired_metrics, 'judge_accuracy')} |
+| Mean Judge Score | {_get(baseline_metrics, 'mean_judge_score')} | {_get(corrupted_metrics, 'mean_judge_score')} | {_get(repaired_metrics, 'mean_judge_score')} |
+
+## Data Quality Gate
+
+| Check | Corrupted | Repaired |
+|---|---|---|
+| GX Validation | {'PASS' if corrupted_quality.get('success') else 'FAIL'} | {'PASS' if repaired_quality.get('success') else 'FAIL'} |
+| Failed Expectations | {_cell(corrupted_quality.get('failed_expectations'))} | {_cell(repaired_quality.get('failed_expectations'))} |
+
+## Freshness SLA
+
+| Field | Corrupted | Repaired |
+|---|---:|---:|
+| Stale Ratio | {_percent(corrupted_freshness.get('stale_ratio'))} | {_percent(repaired_freshness.get('stale_ratio'))} |
+| Is Fresh | {'YES' if corrupted_freshness.get('is_fresh') else 'NO'} | {'YES' if repaired_freshness.get('is_fresh') else 'NO'} |
+
+## Conclusion
+
+The system detected Silent Failure when Hit Rate dropped from **{_get(baseline_metrics, 'retrieval_hit_rate')}** to **{_get(corrupted_metrics, 'retrieval_hit_rate')}** after data corruption.
+After triggering the idempotent repair flow from raw records, performance recovered to **{_get(repaired_metrics, 'retrieval_hit_rate')}**.
+"""
+    write_text(report_path, report)
+
