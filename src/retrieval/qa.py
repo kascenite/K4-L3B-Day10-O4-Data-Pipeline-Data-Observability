@@ -20,17 +20,24 @@ class AnswerResult:
 def _extract_answer(question: str, top_result: SearchResult) -> str:
     lowered = question.lower()
     metadata = top_result.metadata
-    if "who authored" in lowered or "list the authors" in lowered:
-        return metadata["authors_joined"]
-    if "when was" in lowered or "publication date" in lowered or "published on" in lowered:
+    if any(phrase in lowered for phrase in ("who authored", "list the authors", "ai là tác giả")):
+        return metadata["authors_joined"] or "Không có thông tin tác giả trong dữ liệu."
+    if any(
+        phrase in lowered
+        for phrase in ("when was", "publication date", "published on", "được xuất bản vào ngày nào")
+    ):
         return metadata["published"]
-    if "what categories" in lowered:
-        return metadata["categories_joined"]
+    if "what categories" in lowered or "danh mục nào" in lowered:
+        return metadata["categories_joined"] or "Bản ghi không có thông tin danh mục (categories)."
+    if "nghiên cứu vấn đề gì" in lowered:
+        return metadata["summary"]
     return first_sentence(metadata["summary"])
 
 
 def answer_question(question: str, settings: Settings, index: LocalEmbeddingIndex, top_k: int | None = None) -> AnswerResult:
-    title_match = re.search(r"'([^']+)'", question)
+    # Support both the typographic quotes used by the Vietnamese benchmark and
+    # straight quotes commonly used by ad-hoc English questions.
+    title_match = re.search(r"['‘\"]([^'’\"]+)['’\"]", question)
     exact = index.lookup(title_match.group(1)) if title_match else None
     retrieved = index.search(question, top_k=top_k)
     if exact:

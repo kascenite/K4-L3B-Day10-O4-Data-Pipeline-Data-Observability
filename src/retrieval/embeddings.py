@@ -8,8 +8,14 @@ from sentence_transformers import SentenceTransformer
 
 @lru_cache(maxsize=2)
 def _load_model(model_name: str) -> SentenceTransformer:
-    # Pin inference to CPU even if a CUDA-enabled torch build is present.
-    return SentenceTransformer(model_name, device="cpu")
+    # Pin inference to CPU and prefer an existing Hugging Face cache. Recent
+    # Transformers versions otherwise make a metadata HEAD request even when
+    # all model files are already cached, which breaks offline reruns.
+    try:
+        return SentenceTransformer(model_name, device="cpu", local_files_only=True)
+    except Exception:
+        # First-time setup still downloads the requested model normally.
+        return SentenceTransformer(model_name, device="cpu")
 
 
 class MiniLMEmbeddings(Embeddings):

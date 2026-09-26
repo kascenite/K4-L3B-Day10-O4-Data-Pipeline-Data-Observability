@@ -94,14 +94,13 @@ class LocalEmbeddingIndex:
 
         embedding_model = MiniLMEmbeddings(settings.embedding_model)
         client = chromadb.PersistentClient(path=str(persist_path))
-        try:
-            client.delete_collection(name=collection_name)
-        except Exception:
-            pass
-        collection = client.create_collection(
+        collection = client.get_or_create_collection(
             name=collection_name,
             configuration={"hnsw": {"space": "cosine"}},
         )
+        existing_ids = collection.get(include=[]).get("ids", [])
+        if existing_ids:
+            collection.delete(ids=existing_ids)
         embeddings = embedding_model.embed_documents([document["content"] for document in documents])
         collection.add(
             ids=[document["record_id"] for document in documents],
@@ -116,7 +115,7 @@ class LocalEmbeddingIndex:
             {
                 "backend": "chroma",
                 "embedding_model": settings.embedding_model,
-                "persist_path": str(persist_path),
+                "persist_path": persist_path.relative_to(settings.paths.project_dir).as_posix(),
                 "collection_name": collection_name,
                 "documents": documents,
             },
@@ -131,11 +130,14 @@ class LocalEmbeddingIndex:
     @classmethod
     def load(cls, settings: Settings, embeddings_path: Path | None = None) -> "LocalEmbeddingIndex":
         payload = read_json(embeddings_path or settings.paths.embeddings_json)
+        persist_path = Path(payload["persist_path"])
+        if not persist_path.is_absolute():
+            persist_path = settings.paths.project_dir / persist_path
         return cls(
             settings=settings,
             collection_name=payload["collection_name"],
             documents=payload["documents"],
-            persist_path=Path(payload["persist_path"]),
+            persist_path=persist_path,
         )
 
     def search(self, query: str, top_k: int | None = None) -> list[SearchResult]:
