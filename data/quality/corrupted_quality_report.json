@@ -1,0 +1,67 @@
+{
+  "report_name": "corrupted",
+  "success": false,
+  "row_count": 22,
+  "evaluated_expectations": 6,
+  "failed_expectations": 3,
+  "expectations": [
+    {
+      "expectation": "expect_table_row_count_to_be_between",
+      "column": null,
+      "success": false,
+      "observed_value": 22,
+      "unexpected_count": null,
+      "unexpected_percent": null
+    },
+    {
+      "expectation": "expect_column_values_to_not_be_null",
+      "column": "paper_id",
+      "success": true,
+      "observed_value": null,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0
+    },
+    {
+      "expectation": "expect_column_values_to_be_unique",
+      "column": "paper_id",
+      "success": false,
+      "observed_value": null,
+      "unexpected_count": 4,
+      "unexpected_percent": 18.181818181818183
+    },
+    {
+      "expectation": "expect_column_values_to_not_be_null",
+      "column": "title",
+      "success": true,
+      "observed_value": null,
+      "unexpected_count": 0,
+      "unexpected_percent": 0.0
+    },
+    {
+      "expectation": "expect_column_value_lengths_to_be_between",
+      "column": "summary",
+      "success": false,
+      "observed_value": null,
+      "unexpected_count": 2,
+      "unexpected_percent": 9.090909090909092
+    },
+    {
+      "expectation": "expect_column_values_to_be_between",
+      "column": "age_days",
+      "success": true,
+      "observed_value": null,
+      "unexpected_count": 2,
+      "unexpected_percent": 9.090909090909092
+    }
+  ],
+  "freshness": {
+    "latest_published": "2026-09-04",
+    "oldest_published": "2025-07-03",
+    "threshold_days": 180,
+    "max_stale_ratio": 0.25,
+    "stale_rows": 2,
+    "total_rows": 22,
+    "stale_ratio": 0.0909,
+    "is_fresh": true
+  }
+}
