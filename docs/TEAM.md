@@ -10,50 +10,48 @@
 
 | STT | Họ và tên | MSSV | Email | Vai trò & Phân công công việc | Báo cáo cá nhân |
 |---:|---|---|---|---|---|
-| 1 | | | | Pipeline Integrator (`core/`, `phase1.py`, `corruption_flow.py`) | `report/.md` |
+| 1 | Nguyễn Thành Vinh | 2A202602889 | | Baseline Pipeline Integrator & Reporting (`phase1.py`, `reporting.py`, `qa.py`, `index.py`, `embeddings.py`) | `report/Nguyễn Thành Vinh_individual_report.md` |
 | 2 | Lương Sỹ Khánh | 2A202602715 | | Data Foundation & Recovery (`crossref.py`, `cleaning.py`, raw data) + GX Quality Gate (`quality.py`) | `report/individual_2A202602715_LuongSyKhanh.md` |
-| 3 | | | | RAG & Vector Index (`retrieval/index.py`, `embeddings.py`, ChromaDB) | `report/<MSSV3>_HoTen.md` |
-| 4 | | | | Observability & Evaluation (`quality.py` GX 1.x, `testset.py`, reporting) | `report/<MSSV4>_HoTen.md` |
-
-*(Nếu nhóm có 3 hoặc 5-6 thành viên, xem bảng phân công chi tiết theo vai trò trong file `CHECKPOINTS.md`)*.
+| 3 | Trần Nam Anh | 2A202602901 | | Benchmark Evaluation & Vector Store Indexing (`testset.py`, `embeddings.py`, collection `papers-baseline`) | `report/TranNamAnh-2A202602901.md` |
+| 4 | Nguyễn Thành Nam | 2A202602827 | | Synthetic Data Corruption Suite & đo lường suy giảm RAG (`corruption.py`, `corruption_flow.py`, báo cáo corruption) | `report/individual_report_2A202602827_Nguyễn_Thành_Nam.md` |
 
 ---
 
 ## # Cá nhân
 
-### ## HoVaTen1-MSSV1
-- **Vai trò:** Trưởng nhóm & Điều phối Pipeline.
+### ## Nguyễn Thành Vinh - 2A202602889
+- **Vai trò:** Tích hợp baseline pipeline & báo cáo pha 1.
 - **Công việc chi tiết đã hoàn thành:**
-  - Thiết lập cấu hình hệ thống `core/config.py` và đường dẫn artifacts `core/utils.py`.
-  - Kết nối luồng thực thi trong `src/pipelines/phase1.py` và `src/pipelines/corruption_flow.py`.
-  - Kiểm tra tính nhất quán của các artifacts và theo dõi Contributor tracking trên GitHub nhánh `main`.
+  - Kết nối luồng baseline trong `src/pipelines/phase1.py`: cleaning, quality gate, index, evaluation, kiểm tra số dòng và số tài liệu trong Chroma (CP3).
+  - Sinh báo cáo `data/reports/phase1_report.md` bằng `generate_phase1_report` trong `src/observability/reporting.py`.
+  - Cho `qa.py` nhận câu hỏi tiếng Việt và dấu ngoặc cong; cho model embedding chạy offline khi đã có cache (`embeddings.py`, `index.py`).
 - **Điều học được / Đóng góp chính:**
-  - Hiểu sâu sắc về thiết kế Idempotent Pipeline và quản lý trạng thái luồng dữ liệu đa tầng.
+  - Orchestration cần invariant rõ ràng (row count, Chroma count) và phải chạy lặp lại được mà không sinh trạng thái thừa.
 
 ### ## Lương Sỹ Khánh - 2A202602715
-- **Vai trò:** Phụ trách Ingestion, Làm sạch & Phục hồi dữ liệu; Quality Gate.
+- **Vai trò:** Phụ trách Ingestion, Làm sạch dữ liệu & Quality Gate.
 - **Công việc chi tiết đã hoàn thành:**
   - Thu thập Crossref API trong `src/ingestion/crossref.py`: retry khi gặp 429/5xx, fallback đọc snapshot local, lọc bản ghi lỗi và tiêu đề không phải tiếng Anh, lưu 2 file raw (CP0).
   - Làm sạch dữ liệu trong `src/ingestion/cleaning.py`: bỏ JATS tag, dedupe theo `paper_id`, tính `age_days`, sinh `text_for_embedding` 5 phần (CP1).
   - Quality Gate GX 1.x và Freshness SLA trong `src/observability/quality.py` (CP1).
-  - Đang làm: Idempotent Repair từ raw snapshot (CP5).
+  - Sửa lỗi `KeyError: 'categories_joined'` trong `src/pipelines/corruption_flow.py` bằng cách giữ chuỗi rỗng khi đọc lại CSV (CP5).
 - **Điều học được / Đóng góp chính:**
   - Truy vết nguồn gốc dữ liệu (Data Lineage): lưu raw snapshot trước khi biến đổi để repair luôn chạy lại được.
 
-### ## HoVaTen3-MSSV3
-- **Vai trò:** Phụ trách RAG, Vector Database & Embedding.
+### ## Trần Nam Anh - 2A202602901
+- **Vai trò:** Phụ trách Benchmark Evaluation & Vector Store Indexing.
 - **Công việc chi tiết đã hoàn thành:**
-  - Quản lý mô hình embedding `sentence-transformers/all-MiniLM-L6-v2`.
-  - Nạp và quản lý 3 collection riêng biệt trong ChromaDB (`papers-baseline`, `papers-corrupted`, `papers-repaired`).
-  - Xây dựng QA Agent truy vấn ngữ cảnh chính xác theo tài liệu.
+  - Sinh bộ 10 câu hỏi qua 4 nhóm (summary, authors, date, categories) trong `src/evaluation/testset.py`, lưu `data/eval/test_set.json` (CP2).
+  - Triển khai embedding `sentence-transformers/all-MiniLM-L6-v2` trong `src/retrieval/embeddings.py`.
+  - Nạp 24 tài liệu sạch vào ChromaDB collection `papers-baseline` (CP2).
 - **Điều học được / Đóng góp chính:**
-  - Cách cô lập các không gian vector để so sánh khách quan giữa dữ liệu sạch và dữ liệu bị lỗi.
+  - RAG agent rất nhạy với chất lượng dữ liệu: metadata lỗi hay text nhiễu không làm crash nhưng làm giảm chất lượng câu trả lời.
 
-### ## HoVaTen4-MSSV4
-- **Vai trò:** Phụ trách Data Observability & Benchmark Evaluation.
+### ## Nguyễn Thành Nam - 2A202602827
+- **Vai trò:** Phụ trách Data Corruption & đo lường suy giảm RAG.
 - **Công việc chi tiết đã hoàn thành:**
-  - Thiết lập Quality Gate theo chuẩn mới **Great Expectations 1.x** và giám sát Freshness SLA trong `src/observability/quality.py`.
-  - Xây dựng bộ câu hỏi đánh giá chuẩn trong `src/evaluation/testset.py`.
-  - Đo lường và xuất bảng đối chiếu 3 trạng thái vào `data/reports/corruption_report.md`.
+  - Tiêm 6 kịch bản lỗi có seed cố định trong `src/ingestion/corruption.py` và ghi `data/results/corruption_log.json` (CP4).
+  - Tích hợp luồng corruption, repair và đánh giá lại trong `src/pipelines/corruption_flow.py`; xuất `corrupted_metrics.json`, `repaired_metrics.json` (CP4, CP5).
+  - Sinh báo cáo đối chiếu 3 trạng thái `data/reports/corruption_report.md` (`reporting.py`); sửa `qa.py` để không crash khi thiếu metadata.
 - **Điều học được / Đóng góp chính:**
-  - Cách thiết lập hệ thống cảnh báo sớm chặn đứng hiện tượng Silent Failure trước khi dữ liệu vào serving layer.
+  - Quality Gate và Freshness SLA kiểm tra hai vấn đề khác nhau, nên cần xem cả hai khi đánh giá chất lượng dữ liệu.
