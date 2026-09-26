@@ -18,7 +18,7 @@
 | 1 | Nguyễn Thành Vinh | 2A202602889 | Baseline Pipeline Integrator & Reporting | `phase1.py`, `reporting.py`, `embeddings.py`, `index.py`, `qa.py`; baseline metrics/report |
 | 2 | Lương Sỹ Khánh | 2A202602715 | Data Foundation & Recovery + Quality Gate | `src/ingestion/crossref.py`, `src/ingestion/cleaning.py`, `src/observability/quality.py`; `data/raw/`, `data/clean/`, `data/quality/` |
 | 3 | [Họ tên] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
-| 4 | Nguyễn Thành Nam | 2A202602827 | [Synthetic Data Corruption Suite & đo lường suy giảm RAG] | `src/ingestion/corruption.py`, `corruption_log.json`, `corrupted_metrics.json` |
+| 4 | Nguyễn Thành Nam | 2A202602827 | Synthetic Data Corruption Suite & đo lường suy giảm RAG | `src/ingestion/corruption.py`, `corruption_log.json`, `corrupted_metrics.json` |
 
 ## 2. Tóm tắt kết quả
 
@@ -62,7 +62,7 @@ Crossref API
 | Embedding/index   | [Input]        | [Model/index config]       | [Đường dẫn artifact] | [Thành viên] |
 | Evaluation        | Test set 10 câu và collection baseline        | Retrieval `top_k=4`, token F1, retrieval hit, judge fallback | `data/results/baseline_metrics.json`, `baseline_answers.json`, `data/reports/phase1_report.md` | Nguyễn Thành Vinh |
 | Observability     | DataFrame sạch | GX 1.x (4 expectation) và freshness SLA | `data/quality/` | Lương Sỹ Khánh (quality gate); [Thành viên] (reporting) |
-| Corruption/repair | [Input]        | [Corruption và repair]    | [Đường dẫn artifact] | [Thành viên] |
+| Corruption/repair | Clean dataset, test set và baseline metrics        | [Corruption và repair]    | `corruption_log.json`, `corrupted_metrics.json` | Nguyễn Thành Nam |
 | Orchestration     | [Input]        | [Thứ tự chạy]           | [Reports/metrics]        | [Thành viên] |
 
 ## 4. Cách tái hiện kết quả
