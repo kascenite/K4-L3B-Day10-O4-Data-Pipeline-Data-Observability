@@ -15,7 +15,7 @@
 
 | STT | Họ và tên | MSSV | Vai trò chính | Module/deliverable sở hữu |
 | --: | --- | --- | --- | --- |
-| 1 | [Họ tên] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
+| 1 | Nguyễn Thành Vinh | 2A202602889 | Baseline Pipeline Integrator & Reporting | `phase1.py`, `reporting.py`, `embeddings.py`, `index.py`, `qa.py`; baseline metrics/report |
 | 2 | Lương Sỹ Khánh | 2A202602715 | Data Foundation & Recovery + Quality Gate | `src/ingestion/crossref.py`, `src/ingestion/cleaning.py`, `src/observability/quality.py`; `data/raw/`, `data/clean/`, `data/quality/` |
 | 3 | [Họ tên] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
 | 4 | [Nếu có] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
@@ -60,7 +60,7 @@ Crossref API
 | Ingestion         | Crossref API (fallback: snapshot) | Fetch, retry 429/5xx, parse, lọc bản ghi lỗi và tiêu đề ngoại ngữ | `data/raw/` | Lương Sỹ Khánh |
 | Cleaning          | `crossref_records.json` | Bỏ JATS tag, dedupe `paper_id`, tính `age_days`, sinh `text_for_embedding` | `data/clean/` | Lương Sỹ Khánh |
 | Embedding/index   | [Input]        | [Model/index config]       | [Đường dẫn artifact] | [Thành viên] |
-| Evaluation        | [Input]        | [Test set và metrics]     | [Đường dẫn artifact] | [Thành viên] |
+| Evaluation        | Test set 10 câu và collection baseline        | Retrieval `top_k=4`, token F1, retrieval hit, judge fallback | `data/results/baseline_metrics.json`, `baseline_answers.json`, `data/reports/phase1_report.md` | Nguyễn Thành Vinh |
 | Observability     | DataFrame sạch | GX 1.x (4 expectation) và freshness SLA | `data/quality/` | Lương Sỹ Khánh (quality gate); [Thành viên] (reporting) |
 | Corruption/repair | [Input]        | [Corruption và repair]    | [Đường dẫn artifact] | [Thành viên] |
 | Orchestration     | [Input]        | [Thứ tự chạy]           | [Reports/metrics]        | [Thành viên] |
@@ -118,7 +118,7 @@ python script/run_corruption_flow.py
 
 | Lệnh             | Trạng thái                                    | Thời điểm chạy gần nhất | Bằng chứng                         |
 | ----------------- | ----------------------------------------------- | ----------------------------- | ------------------------------------ |
-| Baseline pipeline | [Thành công/Thất bại một phần/Thất bại] | [Thời gian]                  | [Artifact hoặc log đã che secret] |
+| Baseline pipeline | Thành công | 2026-09-26 | `data/results/baseline_metrics.json`, `data/reports/phase1_report.md` |
 | Corruption flow   | [Thành công/Thất bại một phần/Thất bại] | [Thời gian]                  | [Artifact hoặc log đã che secret] |
 
 ## 5. Ingestion, cleaning và data contract
@@ -163,18 +163,18 @@ Giải thích cách nhóm tạo `text_for_embedding`, document ID và `age_days`
 
 | Thành phần                             | Cấu hình thực tế          |
 | ---------------------------------------- | ----------------------------- |
-| Số câu hỏi                            | [Số lượng]                 |
-| Các`question_type`                    | [Danh sách]                  |
-| Ground-truth document ID                 | [Cách tạo/đối chiếu]     |
-| Embedding model                          | [Tên model]                  |
-| Vector store/collection                  | [Tên/config]                 |
-| Retrieval`top_k`                       | [Giá trị]                   |
-| LLM provider/model                       | [Giá trị]                   |
-| Test set dùng chung cho ba trạng thái | [Đường dẫn hoặc ID/hash] |
+| Số câu hỏi                            | 10 |
+| Các `question_type`                    | `summary`, `authors`, `date`, `categories` |
+| Ground-truth document ID                 | `paper_id` của record được chọn, lưu trong `ground_truth_doc_ids` |
+| Embedding model                          | `sentence-transformers/all-MiniLM-L6-v2` |
+| Vector store/collection                  | ChromaDB collection `papers-baseline`, cosine space, 24 documents |
+| Retrieval `top_k`                       | 4 |
+| LLM provider/model                       | `custom` / `gemini-flash-lite`; judge fallback trong lần chạy baseline |
+| Test set dùng chung cho ba trạng thái | `data/eval/test_set.json` |
 
 Giải thích vì sao test set được giữ nguyên khi đánh giá baseline, corrupted và repaired:
 
-[Giải thích tại đây.]
+Giữ nguyên test set và `ground_truth_doc_ids` giúp các thay đổi metric giữa baseline, corrupted và repaired chỉ phản ánh thay đổi dữ liệu/index. Nếu thay câu hỏi hoặc ground truth giữa các trạng thái, độ khó benchmark trở thành biến gây nhiễu và phép so sánh không còn công bằng.
 
 ## 7. Kết quả baseline
 
@@ -182,23 +182,23 @@ Giải thích vì sao test set được giữ nguyên khi đánh giá baseline, 
 
 | Artifact                 | Đường dẫn thực tế                | Trạng thái | Ghi chú   |
 | ------------------------ | -------------------------------------- | ------------ | ---------- |
-| Raw response/records     | `data/raw/`                          | Có | 48 bản ghi thô, 24 record |
-| Cleaned dataset          | `data/clean/`                        | Có | 24 dòng, 16 cột |
-| Embedding manifest/index | `data/embeddings/`                   | [Có/Thiếu] | [Ghi chú] |
-| Evaluation set           | `data/eval/`                         | [Có/Thiếu] | [Ghi chú] |
-| Baseline metrics         | `data/results/baseline_metrics.json` | [Có/Thiếu] | [Ghi chú] |
-| Quality/freshness        | `data/quality/`                      | Có | Bản chạy CP1 (`test_*`), bản baseline chờ CP3 |
-| Baseline report          | `data/reports/phase1_report.md`      | [Có/Thiếu] | [Ghi chú] |
+| Raw response/records     | `data/raw/`                          | Có | 24 parsed records |
+| Cleaned dataset          | `data/clean/`                        | Có | 24 clean rows trong CSV và JSON |
+| Embedding manifest/index | `data/embeddings/`, `data/chroma/`   | Có | Portable manifest; collection có 24 documents |
+| Evaluation set           | `data/eval/`                         | Có | 10 câu, đủ 4 question types |
+| Baseline metrics         | `data/results/baseline_metrics.json` | Có | Hit rate và token F1 đã xác minh |
+| Quality/freshness        | `data/quality/`                      | Có | 6/6 expectations pass; freshness pass |
+| Baseline report          | `data/reports/phase1_report.md`      | Có | Được sinh tự động từ artifacts |
 
 ### Baseline metrics
 
 | Metric                 |       Giá trị | Diễn giải                             |
 | ---------------------- | --------------: | --------------------------------------- |
-| `retrieval_hit_rate` |     [Giá trị] | [Ý nghĩa trong kết quả của nhóm]  |
-| `mean_token_f1`      |     [Giá trị] | [Diễn giải]                           |
-| `judge_accuracy`     |     [Giá trị] | [Diễn giải]                           |
-| `mean_judge_score`   |     [Giá trị] | [Diễn giải]                           |
-| Ragas, nếu có        | [Giá trị/N/A] | [Diễn giải hoặc lý do không chạy] |
+| `retrieval_hit_rate` | 1.0000 | 10/10 câu lấy được ground-truth document |
+| `mean_token_f1`      | 1.0000 | Câu trả lời khớp ground truth theo token F1 |
+| `judge_accuracy`     | 1.0000 | Heuristic fallback đánh giá đúng 10/10; chưa phải live LLM judge |
+| `mean_judge_score`   | 5.00 | Điểm fallback judge trung bình tối đa |
+| Ragas, nếu có        | N/A | Mặc định bỏ qua; đặt `RUN_RAGAS=1` để chạy pass chậm hơn |
 
 ## 8. Data quality và freshness
 
@@ -206,24 +206,21 @@ Giải thích vì sao test set được giữ nguyên khi đánh giá baseline, 
 
 | Check        | Quality dimension | Ngưỡng/kỳ vọng | Kết quả baseline      | Bằng chứng |
 | ------------ | ----------------- | ------------------ | ----------------------- | ------------ |
-| `expect_table_row_count_to_be_between` | Completeness | đúng 24 dòng | Pass (24) | `data/quality/test_quality_report.json` |
-| `expect_column_values_to_not_be_null` (`paper_id`) | Completeness | 0 null | Pass (0) | như trên |
-| `expect_column_values_to_be_unique` (`paper_id`) | Uniqueness | 0 trùng | Pass (0) | như trên |
-| `expect_column_values_to_not_be_null` (`title`) | Completeness | 0 null | Pass (0) | như trên |
-| `expect_column_value_lengths_to_be_between` (`summary`) | Validity | 50 đến 10000 ký tự | Pass (0 vi phạm) | như trên |
-| `expect_column_values_to_be_between` (`age_days`, `mostly=0.75`) | Timeliness | 0 đến 180 ngày cho ít nhất 75% dòng | Pass (0 vi phạm) | như trên |
-
-Số liệu trên từ lệnh kiểm tra CP1. Bản baseline chính thức sẽ do `run_phase1.py` tạo ở CP3.
+| Row count | Completeness | 24–24 rows | Pass: 24 | `data/quality/baseline_quality_report.json` |
+| `paper_id` not null và unique | Completeness/Uniqueness | 0 null, 0 duplicate | Pass | `data/quality/baseline_quality_report.json` |
+| `title` not null | Completeness | 0 null | Pass | `data/quality/baseline_quality_report.json` |
+| Summary length | Validity | 50–10,000 ký tự | Pass | `data/quality/baseline_quality_report.json` |
+| `age_days` trong SLA | Freshness | Ít nhất 75% ≤ 180 ngày | Pass | `data/quality/baseline_quality_report.json` |
 
 ### Freshness
 
 | Thuộc tính               | Giá trị                           |
 | -------------------------- | ----------------------------------- |
-| Freshness được đo tại | Clean dataset (`published`, `age_days`) |
-| Timestamp mới nhất       | 2026-09-15 (cũ nhất 2026-04-01) |
-| Ngưỡng freshness         | 180 ngày, tối đa 25% bài quá hạn |
-| Trạng thái baseline      | Fresh                               |
-| Lý do                     | 0/24 bài quá 180 ngày vì query chỉ lấy bài trong 180 ngày gần nhất (`data/quality/test_freshness.json`) |
+| Freshness được đo tại | Clean dataframe; `data/quality/freshness_report.json` |
+| Timestamp mới nhất       | 2026-09-15 |
+| Ngưỡng freshness         | 180 ngày; stale ratio tối đa 25% |
+| Trạng thái baseline      | Fresh |
+| Lý do                     | 0/24 records quá 180 ngày; stale ratio 0% |
 
 ## 9. Corruption scenarios và repair
 
@@ -268,7 +265,10 @@ Mô tả một vấn đề phát sinh khi ghép các module trong pipeline và c
 - **Nguyên nhân:** [Root cause.]
 - **Cách xử lý:** [Thay đổi đã thực hiện.]
 - **Cách xác minh:** [Lệnh và artifact.]
-
+- **Triệu chứng:** Pipeline lỗi `WinError 10013` khi Sentence Transformers gửi HEAD request tới Hugging Face dù model đã cache; QA baseline cũng không exact-match được tiêu đề trong dấu ngoặc cong `‘…’` của câu hỏi tiếng Việt.
+- **Nguyên nhân:** Model loader mặc định vẫn kiểm tra metadata online; QA parser ban đầu chỉ nhận dấu nháy và keyword tiếng Anh.
+- **Cách xử lý:** Ưu tiên `local_files_only=True` trước khi fallback online; hỗ trợ dấu ngoặc thẳng/cong và bốn loại câu hỏi tiếng Việt; tái sử dụng Chroma collection thay vì delete/recreate để tránh segment mồ côi.
+- **Cách xác minh:** Chạy lại `python script/run_phase1.py` khi network bị chặn; pipeline exit code 0, Chroma count 24, `retrieval_hit_rate=1.0`, `mean_token_f1=1.0` trong `data/results/baseline_metrics.json`.
 ## 12. Giới hạn và hướng cải thiện
 
 | Giới hạn hiện tại | Ảnh hưởng   | Hướng cải thiện có thể kiểm chứng |
@@ -283,8 +283,8 @@ Mô tả một vấn đề phát sinh khi ghép các module trong pipeline và c
 - [ ] Phân công khớp với module, artifact và kết quả thực tế.
 - [ ] Lệnh tái hiện đã được chạy lại trên phiên bản dùng để nộp.
 - [ ] Baseline, corrupted và repaired dùng cùng evaluation set.
-- [ ] Bảng metrics khớp với các file trong `data/results/`.
-- [ ] Quality/freshness conclusions khớp với `data/quality/`.
-- [ ] Các đường dẫn báo cáo và artifact truy cập được.
+- [x] Bảng metrics khớp với các file trong `data/results/`.
+- [x] Quality/freshness conclusions khớp với `data/quality/`.
+- [x] Các đường dẫn báo cáo và artifact truy cập được.
 - [ ] Mỗi thành viên đã hoàn thành báo cáo vai trò riêng.
-- [ ] Không có `.env`, API key, token hoặc secret trong source, report, log hay ảnh.
+- [x] Không có `.env`, API key, token hoặc secret trong source, report, log hay ảnh.
