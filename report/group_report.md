@@ -18,7 +18,7 @@
 | 1 | [Họ tên] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
 | 2 | Lương Sỹ Khánh | 2A202602715 | Data Foundation & Recovery + Quality Gate | `src/ingestion/crossref.py`, `src/ingestion/cleaning.py`, `src/observability/quality.py`; `data/raw/`, `data/clean/`, `data/quality/` |
 | 3 | [Họ tên] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
-| 4 | [Nếu có] | [MSSV] | [Vai trò] | [File, hàm hoặc artifact] |
+| 4 | Nguyễn Thành Nam | 2A202602827 | [Synthetic Data Corruption Suite & đo lường suy giảm RAG] | `src/ingestion/corruption.py`, `corruption_log.json`, `corrupted_metrics.json` |
 
 ## 2. Tóm tắt kết quả
 
