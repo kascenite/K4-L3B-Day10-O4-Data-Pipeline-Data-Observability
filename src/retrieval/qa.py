@@ -21,17 +21,17 @@ def _extract_answer(question: str, top_result: SearchResult) -> str:
     lowered = question.lower()
     metadata = top_result.metadata
     if any(phrase in lowered for phrase in ("who authored", "list the authors", "ai là tác giả")):
-        return metadata["authors_joined"] or "Không có thông tin tác giả trong dữ liệu."
+        return metadata.get("authors_joined") or "Không có thông tin tác giả trong dữ liệu."
     if any(
         phrase in lowered
         for phrase in ("when was", "publication date", "published on", "được xuất bản vào ngày nào")
     ):
-        return metadata["published"]
+        return metadata.get("published") or "Không có thông tin ngày xuất bản trong dữ liệu."
     if "what categories" in lowered or "danh mục nào" in lowered:
-        return metadata["categories_joined"] or "Bản ghi không có thông tin danh mục (categories)."
+        return metadata.get("categories_joined") or "Bản ghi không có thông tin danh mục (categories)."
     if "nghiên cứu vấn đề gì" in lowered:
-        return metadata["summary"]
-    return first_sentence(metadata["summary"])
+        return metadata.get("summary") or "Không có tóm tắt trong dữ liệu."
+    return first_sentence(metadata.get("summary") or "Không có tóm tắt trong dữ liệu.")
 
 
 def answer_question(question: str, settings: Settings, index: LocalEmbeddingIndex, top_k: int | None = None) -> AnswerResult:

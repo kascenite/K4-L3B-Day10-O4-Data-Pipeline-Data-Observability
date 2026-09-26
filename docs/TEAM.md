@@ -1,8 +1,8 @@
 # Danh Sách Thành Viên & Báo Cáo Phân Công Nhóm
 
-- **Tên Nhóm:** `[Điền tên nhóm]`
-- **Mã Nhóm / Lớp:** `K4-L3-DAY10`
-- **Tên Repository Nộp Bài:** `K4-L3-DAY10-TenNhom-DataPipeline`
+- **Tên Nhóm:** `O4`
+- **Mã Nhóm / Lớp:** `K4-L3B-DAY10`
+- **Tên Repository Nộp Bài:** `K4-L3B-Day10-O4-Data-Pipeline-Data-Observability`
 
 ---
 
@@ -10,8 +10,8 @@
 
 | STT | Họ và tên | MSSV | Email | Vai trò & Phân công công việc | Báo cáo cá nhân |
 |---:|---|---|---|---|---|
-| 1 | | | | Trưởng nhóm / Pipeline Integrator (`core/`, `phase1.py`, `corruption_flow.py`) | `report/<MSSV1>_HoTen.md` |
-| 2 | | | | Data Foundation & Recovery (`crossref.py`, `cleaning.py`, raw data) | `report/<MSSV2>_HoTen.md` |
+| 1 | | | | Pipeline Integrator (`core/`, `phase1.py`, `corruption_flow.py`) | `report/.md` |
+| 2 | Lương Sỹ Khánh | 2A202602715 | | Data Foundation & Recovery (`crossref.py`, `cleaning.py`, raw data) + GX Quality Gate (`quality.py`) | `report/individual_2A202602715_LuongSyKhanh.md` |
 | 3 | | | | RAG & Vector Index (`retrieval/index.py`, `embeddings.py`, ChromaDB) | `report/<MSSV3>_HoTen.md` |
 | 4 | | | | Observability & Evaluation (`quality.py` GX 1.x, `testset.py`, reporting) | `report/<MSSV4>_HoTen.md` |
 
@@ -30,14 +30,15 @@
 - **Điều học được / Đóng góp chính:**
   - Hiểu sâu sắc về thiết kế Idempotent Pipeline và quản lý trạng thái luồng dữ liệu đa tầng.
 
-### ## HoVaTen2-MSSV2
-- **Vai trò:** Phụ trách Ingestion, Làm sạch & Phục hồi dữ liệu.
+### ## Lương Sỹ Khánh - 2A202602715
+- **Vai trò:** Phụ trách Ingestion, Làm sạch & Phục hồi dữ liệu; Quality Gate.
 - **Công việc chi tiết đã hoàn thành:**
-  - Xây dựng module thu thập Crossref API với cơ chế Fallback offline trong `src/ingestion/crossref.py`.
-  - Chuẩn hóa schema, tính toán trường `age_days` và `text_for_embedding` trong `src/ingestion/cleaning.py`.
-  - Thực thi cơ chế Idempotent Repair phục hồi dữ liệu từ raw snapshot.
+  - Thu thập Crossref API trong `src/ingestion/crossref.py`: retry khi gặp 429/5xx, fallback đọc snapshot local, lọc bản ghi lỗi và tiêu đề không phải tiếng Anh, lưu 2 file raw (CP0).
+  - Làm sạch dữ liệu trong `src/ingestion/cleaning.py`: bỏ JATS tag, dedupe theo `paper_id`, tính `age_days`, sinh `text_for_embedding` 5 phần (CP1).
+  - Quality Gate GX 1.x và Freshness SLA trong `src/observability/quality.py` (CP1).
+  - Đang làm: Idempotent Repair từ raw snapshot (CP5).
 - **Điều học được / Đóng góp chính:**
-  - Kỹ thuật truy vết nguồn gốc dữ liệu (Data Lineage) và bảo toàn raw snapshot trước khi biến đổi.
+  - Truy vết nguồn gốc dữ liệu (Data Lineage): lưu raw snapshot trước khi biến đổi để repair luôn chạy lại được.
 
 ### ## HoVaTen3-MSSV3
 - **Vai trò:** Phụ trách RAG, Vector Database & Embedding.
