@@ -21,15 +21,12 @@
 | Raw ingestion | `crossref.py`: `fetch_source_records`, `parse_crossref_payload`, `load_raw_records` | Crossref API, `Settings` | `data/raw/crossref_response.json`, `data/raw/crossref_records.json` | Hoàn thành |
 | Cleaning | `cleaning.py`: `build_clean_dataframe` | 24 `PaperRecord` | `data/clean/papers_clean.csv`, `.json` | Hoàn thành |
 | Quality gate | `quality.py`: `run_data_quality_checks`, `build_freshness_report` | DataFrame sạch | `data/quality/<name>_quality_report.json`, `<name>_freshness.json` | Hoàn thành |
-| Repair | Hàm repair cho `corruption_flow.py` | `data/raw/crossref_records.json` | Repaired dataset | Chưa hoàn thành (CP5) |
-
-Test set (`testset.py`) và ChromaDB index (`index.py`) đọc trực tiếp `papers_clean.json` do tôi tạo.
 
 ### Việc hỗ trợ ngoài phạm vi chính
 
 | Hoạt động | Thành viên/module được hỗ trợ | Kết quả |
 | --------- | ------------------------------ | ------- |
-| Cài môi trường `uv` và `.env` | Cả nhóm | `.venv` Python 3.12 in `Môi trường sẵn sàng` |
+| Sửa lỗi `KeyError: 'categories_joined'` khi chạy CP5 | `src/pipelines/corruption_flow.py` | Đọc CSV với `keep_default_na=False` để ô rỗng không thành `NaN` và không bị Chroma bỏ khỏi metadata. `run_corruption_flow.py` chạy hết và in bảng 3 trạng thái |
 
 ## 3. Kết quả theo vai trò
 
@@ -40,13 +37,13 @@ Test set (`testset.py`) và ChromaDB index (`index.py`) đọc trực tiếp `pa
 | Làm sạch, sinh `text_for_embedding` | `cleaning.py` | 24 dòng sạch | Lệnh CP1: `Clean thành công 24 dòng` |
 | Quality gate GX 1.x và freshness | `quality.py` | 6/6 expectation pass, `is_fresh = true` | Lệnh CP1: `Quality check status = True` |
 
-Output cụ thể: `data/quality/test_quality_report.json` cho 6/6 expectation pass trên 24 dòng. Tôi cũng thử gate trên dữ liệu hỏng (1 dòng trùng, 1 summary rỗng, 10/25 dòng có `age_days = 400`). Kết quả `success = False`, `is_fresh = False`, fail 4 expectation: row count, unique `paper_id`, độ dài summary, freshness.
+Output cụ thể: `data/quality/test_quality_report.json` cho 6/6 expectation pass trên 24 dòng. Khi thử gate trên dữ liệu hỏng (1 dòng trùng, 1 summary rỗng, 10/25 dòng có `age_days = 400`): kết quả `success = False`, `is_fresh = False`, fail 4 expectation: row count, unique `paper_id`, độ dài summary, freshness.
 
 ## 4. Giải thích phần kỹ thuật đã thực hiện
 
 ### Vấn đề cần giải quyết
 
-Agent chỉ trả lời đúng khi dữ liệu đưa vào index đủ, không trùng và còn mới. Phần của tôi lấy dữ liệu từ Crossref, làm sạch và chặn dữ liệu xấu trước khi embed.
+Lấy dữ liệu từ Crossref, làm sạch và chặn dữ liệu xấu trước khi embed.
 
 ### Cách triển khai
 
@@ -75,15 +72,15 @@ python -c "from core.config import load_settings; from observability.quality imp
 ```
 
 - **Kết quả mong đợi:** `Đã tải 24 bài báo`, `Clean thành công 24 dòng`, `Quality check status = True`.
-- **Kết quả thực tế:** đúng như mong đợi (chạy 2026-09-26, dữ liệu lấy lúc 10:06).
+- **Kết quả thực tế:** đúng như mong đợi (dữ liệu lấy lúc 10:06).
 - **Artifact/log:** `data/raw/`, `data/clean/`, `data/quality/test_quality_report.json`, `data/quality/test_freshness.json`.
 
 ## 5. Một quyết định kỹ thuật quan trọng
 
 - **Bối cảnh:** Lần crawl đầu có 1 bài tiếng Nga và 2 bài tiếng Indonesia. Trường `language` của Crossref trống ở phần lớn bản ghi.
-- **Các phương án đã cân nhắc:** (1) chỉ dùng trường `language`; (2) bắt buộc tiêu đề có hư từ tiếng Anh; (3) thêm thư viện `langdetect`; (4) loại tiêu đề có chữ ngoài ASCII hoặc có hư từ của ngôn ngữ Latin khác (dan, untuk, para, und...).
-- **Phương án đã chọn:** (1) kết hợp (4), và lấy 48 bản ghi để sau khi lọc vẫn đủ 24.
-- **Lý do:** (3) phải sửa `uv.lock` dùng chung của nhóm. (2) loại nhầm tiêu đề tiếng Anh (xem mục 6). (4) chỉ cần thư viện chuẩn. Nhược điểm: tiêu đề ngoại ngữ không chứa từ nào trong danh sách vẫn lọt qua.
+- **Các phương án đã cân nhắc:** (1) chỉ dùng trường `language`; (2) bắt buộc tiêu đề có hư từ tiếng Anh; (3) thêm thư viện `langdetect`; (4) loại tiêu đề có chữ ngoài ASCII hoặc có từ của ngôn ngữ Latin khác.
+- **Phương án đã chọn:** (1) kết hợp (4) và lấy 48 bản ghi để sau khi lọc vẫn đủ 24.
+- **Lý do:** (3) phải sửa `uv.lock` dùng chung của nhóm. (2) loại nhầm tiêu đề tiếng Anh. (4) chỉ cần thư viện chuẩn. Nhược điểm: tiêu đề ngoại ngữ không chứa từ nào trong danh sách vẫn lọt qua.
 - **Bằng chứng quyết định phù hợp:** trong 48 bản ghi, bộ lọc loại đúng 3 tiêu đề ngoại ngữ; 24 tiêu đề còn lại đều là tiếng Anh. Snapshot gốc vẫn parse ra đúng 24 record như ban đầu.
 
 ## 6. Một lỗi hoặc blocker đã xử lý
@@ -107,31 +104,31 @@ python -c "from core.config import load_settings; from observability.quality imp
 
 ## 8. Phân tích kết quả
 
-Các ô `[Chờ CPx]` sẽ điền khi nhóm chạy xong CP2 đến CP5.
+Số liệu lấy từ `data/results/*_metrics.json` và `data/quality/*_quality_report.json` trên nhánh `main`.
 
 ### Metrics chính
 
 | Metric/signal          | Baseline | Corrupted | Repaired | Nhận xét của cá nhân |
 | ---------------------- | -------: | --------: | -------: | ------------------------- |
-| `retrieval_hit_rate` | [Chờ CP3] | [Chờ CP4] | [Chờ CP5] | |
-| `mean_token_f1`      | [Chờ CP3] | [Chờ CP4] | [Chờ CP5] | |
-| `judge_accuracy`     | [Chờ CP3] | [Chờ CP4] | [Chờ CP5] | |
-| `mean_judge_score`   | [Chờ CP3] | [Chờ CP4] | [Chờ CP5] | |
-| Quality checks         | 6/6 pass | [Chờ CP4] | [Chờ CP5] | Thử trên dữ liệu hỏng: fail 4/6 |
-| Freshness status       | Fresh (0/24 stale) | [Chờ CP4] | [Chờ CP5] | Thử với 40% dòng stale: `is_fresh = false` |
+| `retrieval_hit_rate` | 1.00 | 0.50 | 1.00 | 5/10 câu mất tài liệu đúng khi 4 bài mới nhất bị xóa |
+| `mean_token_f1`      | 1.00 | 0.72 | 1.00 | Giảm ít hơn hit rate vì 2 câu `categories` vẫn trả đúng câu "không có danh mục" |
+| `judge_accuracy`     | 1.00 | 0.70 | 1.00 | Judge chạy bằng heuristic dự phòng theo token F1, không phải LLM |
+| `mean_judge_score`   | 5.0 | 3.8 | 5.0 | Như trên |
+| Quality checks         | 6/6 pass | Fail 3/6 | 6/6 pass | Gate bắt được: số dòng 22, `paper_id` trùng, summary rỗng |
+| Freshness status       | Fresh (0/24) | Fresh (2/22 stale) | Fresh (0/24) | Chỉ 9% bài bị làm cũ, dưới ngưỡng 25% nên không báo động |
 
 ### Kết luận từ số liệu
 
-1. [Data corruption] → [quality/freshness signal thay đổi] → [agent metric thay đổi]. [Chờ CP4]
-2. [Repair action] → [quality/freshness signal phục hồi] → [agent metric phục hồi hoặc chưa phục hồi]. [Chờ CP5]
+1. Xóa 4 bài mới nhất và nhân đôi 2 dòng → gate fail ở row count và unique `paper_id` → hit rate giảm từ 1.00 xuống 0.50.
+2. Repair dựng lại dữ liệu từ `crossref_records.json` bằng `build_clean_dataframe` → gate pass 6/6, 24 dòng → hit rate và token F1 về 1.00.
 
 Corruption nào ảnh hưởng rõ nhất và vì sao?
 
-[Chờ CP4]
+Xóa bài mới nhất. Test set chọn bài theo thứ tự mới nhất trước, nên 5/10 câu (q01, q02, q04, q09, q10) hỏi về 4 bài bị xóa. Cả 5 câu đều mất tài liệu đúng, các câu còn lại vẫn trả lời đúng.
 
 Kết quả nào khác với kỳ vọng ban đầu?
 
-Dữ liệu Crossref thật khác snapshot mẫu. Cả 24 bài đều không có `subject`, nên `categories_joined` rỗng và nhóm câu hỏi `categories` ở CP2 thiếu đáp án. 40/48 abstract thô có JATS XML và 16/48 bắt đầu bằng chữ "Abstract"; cleaning đã xử lý cả hai.
+Freshness không báo động ở trạng thái corrupted vì bước lùi ngày chỉ làm cũ 2/22 bài. Ngoài ra dữ liệu Crossref thật không có `subject` ở cả 24 bài, nên câu hỏi `categories` chỉ kiểm được câu trả lời "không có danh mục".
 
 ## 9. Điều học được và hướng cải thiện
 
@@ -149,12 +146,12 @@ Thay heuristic lọc ngôn ngữ bằng bộ nhận diện ngôn ngữ thật, v
 
 Đánh dấu sau khi tự kiểm tra:
 
-- [ ] Nội dung báo cáo phản ánh đúng phần việc và mức hiểu của tôi.
-- [ ] Tôi có thể giải thích luồng end-to-end, không chỉ module mình phụ trách.
-- [ ] Mọi kết luận về kết quả đều có artifact hoặc metric để đối chiếu.
-- [ ] Tôi không ghi “đã chạy thành công” cho phần chưa được kiểm chứng.
-- [ ] Báo cáo không chứa `.env`, API key, token hoặc secret.
-- [ ] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
+- [x] Nội dung báo cáo phản ánh đúng phần việc và mức hiểu của tôi.
+- [x] Tôi có thể giải thích luồng end-to-end, không chỉ module mình phụ trách.
+- [x] Mọi kết luận về kết quả đều có artifact hoặc metric để đối chiếu.
+- [x] Tôi không ghi “đã chạy thành công” cho phần chưa được kiểm chứng.
+- [x] Báo cáo không chứa `.env`, API key, token hoặc secret.
+- [x] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
 
 **Họ và tên:** Lương Sỹ Khánh
-**Ngày xác nhận:** [YYYY-MM-DD]
+**Ngày xác nhận:** 2026-09-26

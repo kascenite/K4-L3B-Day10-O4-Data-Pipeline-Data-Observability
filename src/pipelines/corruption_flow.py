@@ -37,7 +37,9 @@ def main() -> None:
     # 2. Load clean data & corrupt it
     # ------------------------------------------------------------------
     print("2. Đang tải clean dataset và tạo corrupted dataframe...")
-    df_clean = pd.read_csv(settings.paths.clean_csv)
+    # keep_default_na=False: empty strings (e.g. categories_joined) must not become NaN,
+    # otherwise Chroma drops those metadata keys and QA lookups fail.
+    df_clean = pd.read_csv(settings.paths.clean_csv, keep_default_na=False)
     df_corrupted = corrupt_clean_dataframe(df_clean, str(settings.paths.corruption_log))
 
     # Save corrupted artifacts
